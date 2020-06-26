@@ -1,0 +1,11 @@
+CommonSecurityLog
+| where TimeGenerated  > ago(7d)
+| whhere DeviceVendor == "Palo Alto Networks"
+| where DeviceName == "<Device Name>"
+| where Activity == "SYSTEM"
+| where FileName == "<Global Protect Gateway Name>" 
+| where Message contains "gateway user login succeeded."
+| parse Message with * "User name:" UserName ", Client" Garbage
+| where UserName <> " pre-logon"
+| summarize Unique_VPN_Users=dcount(UserName) by bin(TimeGenerated, 1d)
+| render timechart 
